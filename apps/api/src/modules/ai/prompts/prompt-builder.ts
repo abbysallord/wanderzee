@@ -6,6 +6,11 @@ export class PromptBuilder {
   buildTripPlanPrompt(dto: GenerateTripDto, placesContext?: string): string {
     const daysCount = this.calculateDays(dto.startDate, dto.endDate);
 
+    let healthInstruction = '';
+    if (dto.healthNotes) {
+      healthInstruction = `\n⚠️ HEALTH-CONSCIOUS PLANNING: ${dto.healthNotes} — Only suggest activities that are safe and suitable. Avoid strenuous climbs, long walks, or intense activities. Include rest periods.`;
+    }
+
     return `
 Generate a detailed ${daysCount}-day trip itinerary for ${dto.destination}, Karnataka, India.
 
@@ -16,15 +21,22 @@ Generate a detailed ${daysCount}-day trip itinerary for ${dto.destination}, Karn
 - Dates: ${dto.startDate} to ${dto.endDate}
 - Starting From: ${dto.startingFrom ?? 'Bengaluru'}
 - Interests: ${dto.interests?.join(', ') ?? 'general sightseeing'}
-${dto.healthNotes ? `- Health Notes: ${dto.healthNotes}` : ''}
+${dto.healthNotes ? `- Health Notes: ${dto.healthNotes}${healthInstruction}` : ''}
 ${dto.dietaryPreferences ? `- Dietary: ${dto.dietaryPreferences}` : ''}
 ${dto.specialRequests ? `- Special Requests: ${dto.specialRequests}` : ''}
+
+## KARNATAKA-SPECIFIC CONTEXT
+- Primary intercity transport: KSRTC buses (frequent, reliable, budget-friendly)
+- Local transport: Auto-rickshaws (common in cities), regular taxis, cabs
+- Monsoon season (June-September) affects Western Ghats — roads may be slippery, waterfalls are full but visibility can be poor
+- Best time for most destinations: October-May
+- Altitude varies greatly — Coorg and Chikmagalur are cool higher altitudes, coastal areas are warm
 
 ${placesContext ? `## KNOWN PLACES IN THE AREA\n${placesContext}\n` : ''}
 
 ## REQUIREMENTS
 1. Create a day-by-day itinerary with specific activities and time slots
-2. Include transport suggestions between places (bus, auto, cab with estimated costs)
+2. Include transport suggestions between places (KSRTC bus, auto, cab with estimated costs)
 3. Include meal recommendations (breakfast, lunch, dinner) matching dietary preferences
 4. Estimate costs for each activity
 5. Add cultural tips and dress code notes where applicable
@@ -32,6 +44,15 @@ ${placesContext ? `## KNOWN PLACES IN THE AREA\n${placesContext}\n` : ''}
 7. Include rest periods — don't over-schedule
 8. Add safety notes if any
 9. Suggest alternatives for each major activity (Plan B)
+
+## IMPORTANT RULES FOR AI
+- All costs MUST be in INR (₹)
+- All times MUST be in 24-hour format (HH:MM)
+- Restaurant recommendations MUST respect dietary preferences
+- If traveler has health concerns, ONLY suggest safe, non-strenuous activities
+- Always include at least one free or low-cost activity per day
+- Transportation time between places must be realistic (add 30% buffer for traffic)
+- NEVER suggest activities that require multiple days if trip is < 3 days
 
 ## RESPONSE FORMAT
 Respond ONLY with valid JSON in this exact structure:
