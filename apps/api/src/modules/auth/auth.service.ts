@@ -97,6 +97,14 @@ export class AuthService {
     return this.generateTokens(stored.user.id, stored.user.email);
   }
 
+  async logout(refreshToken: string) {
+    await this.prisma.refreshToken.delete({
+      where: { token: refreshToken },
+    });
+
+    return { message: 'Logged out successfully' };
+  }
+
   private async generateTokens(userId: string, email: string) {
     const accessToken = this.jwtService.sign({ sub: userId, email });
 
