@@ -1,8 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, ForbiddenException } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { GroqProvider } from './providers/groq.provider';
 import { GeminiProvider } from './providers/gemini.provider';
 import { PromptBuilder } from './prompts/prompt-builder';
+import { AiUsageService } from './ai-usage.service';
 import { GenerateTripDto } from './dto/generate-trip.dto';
 import { QuickChatDto } from './dto/quick-chat.dto';
 import { RedisService } from '@/common/redis/redis.service';
@@ -20,9 +21,28 @@ export class AiService {
     private redis: RedisService,
     private prisma: PrismaService,
     private placesService: PlacesService,
+    private usageService: AiUsageService,
   ) {}
 
   async generateTripPlan(userId: string, dto: GenerateTripDto) {
+    // Get user details to check role
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Check if user can generate a trip plan
+    const canGenerate = await this.usageService.canGenerateTrip(userId, user.role);
+    if (!canGenerate) {
+      throw new ForbiddenException(
+        'Free plan limit reached. Upgrade to Pro for unlimited trip plans.',
+      );
+    }
+
     const cacheKey = this.buildCacheKey(dto);
     const cached = await this.redis.getJson<Record<string, unknown>>(cacheKey);
     if (cached) {
@@ -133,6 +153,15 @@ export class AiService {
     };
 
     await this.redis.setJson(cacheKey, response, 7200);
+
+    // Track usage after successful trip plan generation
+    await this.usageService.trackUsage(
+      userId,
+      result.model,
+      result.promptTokens,
+      result.completionTokens,
+    );
+
     return response;
   }
 
