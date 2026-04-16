@@ -86,10 +86,10 @@ git clone https://github.com/YOUR-USERNAME/wanderzee.git
 cd wanderzee
 
 # Start Docker containers (PostgreSQL + Redis)
-docker-compose up -d
+docker compose up -d
 
 # Verify containers are running
-docker-compose ps
+docker compose ps
 ```
 
 ### Backend Setup (NestJS API)
@@ -496,6 +496,66 @@ describe("Trip Planning (E2E)", () => {
 });
 ```
 
+### Testing Hardened Modules (Quick Commands)
+
+**Auth Module Hardening:**
+
+```bash
+# Start dev server (in Terminal 1)
+cd apps/api && npm run start:dev
+
+# In Terminal 2: Test weak password rejection
+curl -X POST http://localhost:3000/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","fullName":"User","password":"weak"}'
+# Should return 400: password must contain uppercase, lowercase, number, special char
+
+# Test registration with strong password
+curl -X POST http://localhost:3000/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","fullName":"User","password":"SecurePass123!"}'
+
+# Test rate limiting (try login 6+ times)
+for i in {1..6}; do curl -X POST http://localhost:3000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"fail"}'; done
+# After 5 attempts: 429 Too Many Requests
+
+# Test logout
+TOKEN=$(curl -s -X POST http://localhost:3000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"SecurePass123!"}' | jq -r '.accessToken')
+
+curl -X POST http://localhost:3000/api/v1/auth/logout \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**AI Module Hardening:**
+
+```bash
+# Get access token
+TOKEN=$(curl -s -X POST http://localhost:3000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"SecurePass123!"}' | jq -r '.accessToken')
+
+# Test quick chat (cached for 1 hour)
+curl -X POST http://localhost:3000/api/v1/ai/quick-chat \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"query":"Best time to visit Coorg?"}'
+
+# Check AI usage
+curl -s -X GET http://localhost:3000/api/v1/ai/usage \
+  -H "Authorization: Bearer $TOKEN" | jq .
+# Shows: currentMonth trip count, FREE tier allows 3/month
+
+# Generate trip (uses ai-usage tracking)
+curl -X POST http://localhost:3000/api/v1/ai/generate-trip \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"duration":2,"budget":10000,"district":"Kodagu"}'
+```
+
 ---
 
 ## 🛠 Common Tasks
@@ -573,11 +633,11 @@ PORT=3001
 
 ```bash
 # Check Docker containers
-docker-compose ps
+docker compose ps
 
 # Restart containers
-docker-compose down
-docker-compose up -d
+docker compose down
+docker compose up -d
 
 # Verify connection
 npm run db:push

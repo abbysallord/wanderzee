@@ -164,7 +164,7 @@ git clone https://github.com/yourusername/wanderzee.git
 cd wanderzee
 
 # Start Docker containers (PostgreSQL + Redis)
-docker-compose up -d
+docker compose up -d
 
 # Backend setup
 cd apps/api
@@ -200,7 +200,7 @@ git clone https://github.com/yourusername/wanderzee.git
 cd wanderzee
 
 # 2. Start infrastructure (Docker)
-docker-compose up -d
+docker compose up -d
 
 # 3. Backend setup
 cd apps/api
@@ -275,7 +275,27 @@ flutter build web      # Build web
 
 ---
 
-## 📡 API Documentation
+## � Security & Hardening
+
+### Authentication Module
+
+- ✅ Input sanitization (trim, lowercase emails)
+- ✅ Strong password validation (8+ chars, uppercase, lowercase, number, special char)
+- ✅ Rate limiting (3 reqs/min register, 5 reqs/min login)
+- ✅ Secure logout with token invalidation
+- ✅ Auto-cleanup of expired refresh tokens
+
+### AI Module
+
+- ✅ Retry logic with exponential backoff (Groq + Gemini)
+- ✅ Custom error types (provider unavailable, rate limit, quota exhausted)
+- ✅ Improved prompts with Karnataka context
+- ✅ Per-user AI usage tracking via Redis
+- ✅ Free tier limits (3 trip plans/month for FREE users)
+
+---
+
+## �📡 API Documentation
 
 **Base URL:** `http://localhost:3000/api/v1`  
 **Swagger UI:** `http://localhost:3000/api/docs`
@@ -294,6 +314,8 @@ flutter build web      # Build web
 | DELETE            | /users/me                  | Delete account           | JWT  |
 | **Trip Planning** |
 | POST              | /ai/generate-trip          | Generate AI trip plan    | JWT  |
+| POST              | /ai/quick-chat             | Fast Q&A (cached)        | JWT  |
+| GET               | /ai/usage                  | Check AI usage quota     | JWT  |
 | GET               | /trips                     | Get user's trips         | JWT  |
 | GET               | /trips/:id                 | Get trip details         | JWT  |
 | PATCH             | /trips/:id/status          | Update trip status       | JWT  |
@@ -327,6 +349,59 @@ See [WANDERZEE_MASTER_DOC.md](docs/WANDERZEE_MASTER_DOC.md) for comprehensive do
 | 👨‍👩‍👧‍👦 Family Vacationer   | Leisure with kids/elderly        | Kid-friendly spots, accessibility, medical facilities      |
 | 🎒 Solo Backpacker     | Budget adventure travel          | Cheapest routes, hostels, safety alerts, hidden gems       |
 | ♿ Accessibility-First | Physical/health limitations      | Wheelchair access, medical facilities, low-exertion routes |
+
+---
+
+## 🚀 Quick Testing
+
+### One-Command Test Suite
+
+```bash
+# Terminal 1: Start backend (if not running)
+cd apps/api && npm run start:dev
+
+# Terminal 2: Test the API
+# 1. Register user
+curl -X POST http://localhost:3000/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","fullName":"Test User","password":"SecurePass123!"}'
+
+# 2. Login
+TOKEN=$(curl -s -X POST http://localhost:3000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"SecurePass123!"}' | jq -r '.accessToken')
+
+# 3. Test quick chat (1-hour cache)
+curl -s -X POST http://localhost:3000/api/v1/ai/quick-chat \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"query":"Best time to visit Coorg?"}' | jq .
+
+# 4. Check AI usage
+curl -s -X GET http://localhost:3000/api/v1/ai/usage \
+  -H "Authorization: Bearer $TOKEN" | jq .
+
+# 5. Test rate limiting (should fail >5 times)
+for i in {1..6}; do
+  curl -s -X POST http://localhost:3000/api/v1/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{"email":"test@example.com","password":"wrong"}' | jq '.message'
+done
+```
+
+---
+
+## 🐛 Troubleshooting
+
+| Issue                             | Solution                                                                |
+| --------------------------------- | ----------------------------------------------------------------------- |
+| `docker compose ps` shows crashes | Run `docker compose down -v && docker compose up -d`                    |
+| Database tables don't exist       | Run `npm run db:push` in `apps/api/`                                    |
+| Port 3000 in use                  | Kill with `lsof -t -i:3000 \| xargs kill -9` or change `PORT` in `.env` |
+| psql connection fails             | Use `docker compose exec postgres psql -U wanderzee -d wanderzee`       |
+| Weak password rejected            | Password needs 8+ chars, uppercase, lowercase, number, special char     |
+| `/api/docs` is blank              | Run `npm run start:dev` and wait 5 seconds                              |
+| Redis connection error            | Check `docker compose ps` — redis should show "running"                 |
 
 ---
 
