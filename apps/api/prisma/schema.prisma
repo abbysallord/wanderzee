@@ -1,12 +1,13 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["postgresqlExtensions"]
+  previewFeatures = ["postgresqlExtensions", "multiSchema"]
 }
 
 datasource db {
   provider   = "postgresql"
   url        = env("DATABASE_URL")
   extensions = [uuidOssp(map: "uuid-ossp"), postgis]
+  schemas    = ["wanderzee"]
 }
 
 // ============================================================
