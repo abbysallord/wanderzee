@@ -4,6 +4,7 @@ import { GroqProvider } from './providers/groq.provider';
 import { GeminiProvider } from './providers/gemini.provider';
 import { PromptBuilder } from './prompts/prompt-builder';
 import { GenerateTripDto } from './dto/generate-trip.dto';
+import { QuickChatDto } from './dto/quick-chat.dto';
 import { RedisService } from '@/common/redis/redis.service';
 import { PrismaService } from '@/common/prisma/prisma.service';
 import { PlacesService } from '../places/places.service';
@@ -159,5 +160,44 @@ export class AiService {
       udupi: 'Udupi',
     };
     return mapping[destination.toLowerCase()] ?? destination;
+  }
+
+  async quickChat(userId: string, dto: QuickChatDto) {
+    // Build cache key for quick chat
+    const cacheKey = `quick-chat:${crypto.createHash('md5').update(dto.query).digest('hex')}`;
+
+    // Check cache first (1 hour TTL)
+    const cached = await this.redis.getJson<{ answer: string }>(cacheKey);
+    if (cached) {
+      this.logger.log('Returning cached quick chat response');
+      return { answer: cached.answer, cached: true };
+    }
+
+    // Build prompt for quick chat
+    const prompt = `You are WanderZee AI. Answer this traveler's quick question about Karnataka travel. Be concise (max 200 words).
+
+Question: ${dto.query}
+${dto.context ? `Context: ${dto.context}` : ''}
+
+Provide a direct, helpful answer.`;
+
+    // Use Groq for fast responses
+    try {
+      this.logger.log('Generating quick chat response with Groq...');
+      const result = await this.groq.generate(prompt, {
+        maxTokens: 300,
+        temperature: 0.7,
+      });
+
+      const answer = result.content.trim();
+
+      // Cache the response
+      await this.redis.setJson(cacheKey, { answer }, 3600);
+
+      return { answer, cached: false };
+    } catch (error) {
+      this.logger.error(`Quick chat failed: ${(error as Error).message}`);
+      throw new Error('Failed to generate quick chat response. Please try again.');
+    }
   }
 }
