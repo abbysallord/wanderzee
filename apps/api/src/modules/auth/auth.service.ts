@@ -69,6 +69,9 @@ export class AuthService {
       data: { lastLoginAt: new Date() },
     });
 
+    // Clean up expired tokens for this user
+    await this.cleanExpiredTokens(user.id);
+
     const tokens = await this.generateTokens(user.id, user.email);
 
     return {
@@ -103,6 +106,17 @@ export class AuthService {
     });
 
     return { message: 'Logged out successfully' };
+  }
+
+  private async cleanExpiredTokens(userId: string) {
+    await this.prisma.refreshToken.deleteMany({
+      where: {
+        userId,
+        expiresAt: {
+          lt: new Date(),
+        },
+      },
+    });
   }
 
   private async generateTokens(userId: string, email: string) {
