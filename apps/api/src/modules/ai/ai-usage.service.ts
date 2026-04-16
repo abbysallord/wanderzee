@@ -2,7 +2,7 @@ import { Injectable, Logger, ForbiddenException } from '@nestjs/common';
 import { RedisService } from '@/common/redis/redis.service';
 import { PrismaService } from '@/common/prisma/prisma.service';
 
-interface MonthlyUsage {
+export interface MonthlyUsage {
   tripPlansGenerated: number;
   totalTokens: number;
 }

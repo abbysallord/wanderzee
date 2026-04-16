@@ -1,7 +1,7 @@
 import { Controller, Post, Body, UseGuards, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { AiService } from './ai.service';
-import { AiUsageService } from './ai-usage.service';
+import { AiUsageService, MonthlyUsage } from './ai-usage.service';
 import { GenerateTripDto } from './dto/generate-trip.dto';
 import { QuickChatDto } from './dto/quick-chat.dto';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
@@ -42,7 +42,7 @@ export class AiController {
       },
     },
   })
-  getUsageStats(@CurrentUser('id') userId: string) {
+  getUsageStats(@CurrentUser('id') userId: string): Promise<MonthlyUsage> {
     return this.usageService.getMonthlyUsage(userId);
   }
 }
