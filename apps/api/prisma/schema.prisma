@@ -1,0 +1,387 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [uuidOssp(map: "uuid-ossp"), postgis]
+}
+
+// ============================================================
+// USER & AUTH
+// ============================================================
+
+model User {
+  id              String    @id @default(uuid()) @db.Uuid
+  email           String    @unique
+  passwordHash    String?   @map("password_hash")
+  fullName        String    @map("full_name")
+  avatarUrl       String?   @map("avatar_url")
+  googleId        String?   @unique @map("google_id")
+  isEmailVerified Boolean   @default(false) @map("is_email_verified")
+  isActive        Boolean   @default(true) @map("is_active")
+  role            UserRole  @default(FREE)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  lastLoginAt     DateTime? @map("last_login_at")
+
+  profile       UserProfile?
+  trips         Trip[]
+  savedPlaces   SavedPlace[]
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+  @@schema("wanderzee")
+}
+
+enum UserRole {
+  FREE
+  PRO
+  ADMIN
+
+  @@schema("wanderzee")
+}
+
+model UserProfile {
+  id                  String      @id @default(uuid()) @db.Uuid
+  userId              String      @unique @map("user_id") @db.Uuid
+  preferredLanguage   String      @default("en") @map("preferred_language")
+  defaultBudgetLevel  BudgetLevel @default(MODERATE) @map("default_budget_level")
+  defaultTripType     TripType?   @map("default_trip_type")
+  dietaryPreferences  String[]    @map("dietary_preferences")
+  accessibilityNeeds  String[]    @map("accessibility_needs")
+  healthNotes         String?     @map("health_notes")
+  culturalPreferences String?     @map("cultural_preferences")
+  emergencyContact    String?     @map("emergency_contact")
+  emergencyPhone      String?     @map("emergency_phone")
+  createdAt           DateTime    @default(now()) @map("created_at")
+  updatedAt           DateTime    @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+  @@schema("wanderzee")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+  @@schema("wanderzee")
+}
+
+// ============================================================
+// TRIPS & ITINERARIES
+// ============================================================
+
+enum TripType {
+  BUSINESS
+  LEISURE
+  RELIGIOUS
+  EDUCATIONAL
+  ADVENTURE
+  MEDICAL
+  FAMILY
+  SOLO_BACKPACKING
+
+  @@schema("wanderzee")
+}
+
+enum BudgetLevel {
+  BUDGET
+  MODERATE
+  PREMIUM
+  LUXURY
+
+  @@schema("wanderzee")
+}
+
+enum TripStatus {
+  DRAFT
+  PLANNED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+
+  @@schema("wanderzee")
+}
+
+model Trip {
+  id               String      @id @default(uuid()) @db.Uuid
+  userId           String      @map("user_id") @db.Uuid
+  title            String
+  tripType         TripType    @map("trip_type")
+  status           TripStatus  @default(DRAFT)
+  budgetLevel      BudgetLevel @map("budget_level")
+  estimatedBudget  Decimal?    @map("estimated_budget") @db.Decimal(10, 2)
+  actualSpent      Decimal     @default(0) @map("actual_spent") @db.Decimal(10, 2)
+  currency         String      @default("INR")
+  startDate        DateTime    @map("start_date")
+  endDate          DateTime    @map("end_date")
+  groupSize        Int         @default(1) @map("group_size")
+  groupComposition String?     @map("group_composition")
+  specialRequests  String?     @map("special_requests")
+  aiModelUsed      String?     @map("ai_model_used")
+  aiPromptTokens   Int?        @map("ai_prompt_tokens")
+  aiResponseTokens Int?        @map("ai_response_tokens")
+  createdAt        DateTime    @default(now()) @map("created_at")
+  updatedAt        DateTime    @updatedAt @map("updated_at")
+
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  days         TripDay[]
+  destinations TripDestination[]
+  expenses     Expense[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("trips")
+  @@schema("wanderzee")
+}
+
+model TripDestination {
+  id           String  @id @default(uuid()) @db.Uuid
+  tripId       String  @map("trip_id") @db.Uuid
+  placeId      String  @map("place_id") @db.Uuid
+  orderIndex   Int     @map("order_index")
+  isStartPoint Boolean @default(false) @map("is_start_point")
+  isEndPoint   Boolean @default(false) @map("is_end_point")
+
+  trip  Trip  @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  place Place @relation(fields: [placeId], references: [id])
+
+  @@map("trip_destinations")
+  @@schema("wanderzee")
+}
+
+model TripDay {
+  id        String   @id @default(uuid()) @db.Uuid
+  tripId    String   @map("trip_id") @db.Uuid
+  dayNumber Int      @map("day_number")
+  date      DateTime
+  title     String?
+  summary   String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  trip       Trip           @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  activities TripActivity[]
+
+  @@unique([tripId, dayNumber])
+  @@map("trip_days")
+  @@schema("wanderzee")
+}
+
+model TripActivity {
+  id             String   @id @default(uuid()) @db.Uuid
+  tripDayId      String   @map("trip_day_id") @db.Uuid
+  orderIndex     Int      @map("order_index")
+  title          String
+  description    String?
+  placeId        String?  @map("place_id") @db.Uuid
+  startTime      String?  @map("start_time")
+  endTime        String?  @map("end_time")
+  estimatedCost  Decimal? @map("estimated_cost") @db.Decimal(10, 2)
+  activityType   String?  @map("activity_type")
+  transportMode  String?  @map("transport_mode")
+  notes          String?
+  routeToNext    String?  @map("route_to_next")
+  distanceToNext Decimal? @map("distance_to_next") @db.Decimal(10, 2)
+  durationToNext Int?     @map("duration_to_next")
+
+  tripDay TripDay @relation(fields: [tripDayId], references: [id], onDelete: Cascade)
+  place   Place?  @relation(fields: [placeId], references: [id])
+
+  @@map("trip_activities")
+  @@schema("wanderzee")
+}
+
+// ============================================================
+// PLACES & POINTS OF INTEREST
+// ============================================================
+
+model Place {
+  id               String        @id @default(uuid()) @db.Uuid
+  name             String
+  nameKannada      String?       @map("name_kannada")
+  nameHindi        String?       @map("name_hindi")
+  description      String?
+  category         PlaceCategory
+  subCategory      String?       @map("sub_category")
+  district         String
+  city             String?
+  address          String?
+  latitude         Decimal       @db.Decimal(10, 8)
+  longitude        Decimal       @db.Decimal(11, 8)
+  avgRating        Decimal       @default(0) @map("avg_rating") @db.Decimal(3, 2)
+  totalReviews     Int           @default(0) @map("total_reviews")
+  avgTimeSpent     Int?          @map("avg_time_spent")
+  entryFee         Decimal?      @map("entry_fee") @db.Decimal(10, 2)
+  openingTime      String?       @map("opening_time")
+  closingTime      String?       @map("closing_time")
+  closedOn         String[]      @map("closed_on")
+  bestTimeToVisit  String[]      @map("best_time_to_visit")
+  accessibilityInfo String?      @map("accessibility_info")
+  dressCode        String?       @map("dress_code")
+  culturalNotes    String?       @map("cultural_notes")
+  imageUrls        String[]      @map("image_urls")
+  tags             String[]
+  isVerified       Boolean       @default(false) @map("is_verified")
+  isActive         Boolean       @default(true) @map("is_active")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  activities        TripActivity[]
+  destinations      TripDestination[]
+  savedByUsers      SavedPlace[]
+  safetyAdvisories  PlaceSafetyAdvisory[]
+
+  @@index([district])
+  @@index([category])
+  @@index([latitude, longitude])
+  @@map("places")
+  @@schema("wanderzee")
+}
+
+enum PlaceCategory {
+  TEMPLE
+  MOSQUE
+  CHURCH
+  GURUDWARA
+  RELIGIOUS_OTHER
+  HERITAGE
+  MUSEUM
+  FORT
+  PALACE
+  NATURE
+  WATERFALL
+  HILL_STATION
+  BEACH
+  WILDLIFE
+  PARK_GARDEN
+  LAKE
+  VIEWPOINT
+  RESTAURANT
+  CAFE
+  STREET_FOOD
+  HOTEL
+  HOMESTAY
+  HOSTEL
+  BUS_STATION
+  RAILWAY_STATION
+  AIRPORT
+  SHOPPING
+  MARKET
+  HOSPITAL
+  PHARMACY
+  ATM
+  EDUCATIONAL
+  ADVENTURE_SPORT
+  AMUSEMENT
+  OTHER
+
+  @@schema("wanderzee")
+}
+
+model SavedPlace {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  placeId   String   @map("place_id") @db.Uuid
+  notes     String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, placeId])
+  @@map("saved_places")
+  @@schema("wanderzee")
+}
+
+// ============================================================
+// SAFETY & ADVISORIES
+// ============================================================
+
+model SafetyAdvisory {
+  id          String         @id @default(uuid()) @db.Uuid
+  title       String
+  description String
+  severity    SafetySeverity
+  district    String?
+  city        String?
+  isActive    Boolean        @default(true) @map("is_active")
+  validFrom   DateTime       @map("valid_from")
+  validUntil  DateTime?      @map("valid_until")
+  source      String?
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  @@index([district])
+  @@index([isActive])
+  @@map("safety_advisories")
+  @@schema("wanderzee")
+}
+
+model PlaceSafetyAdvisory {
+  id        String         @id @default(uuid()) @db.Uuid
+  placeId   String         @map("place_id") @db.Uuid
+  advisory  String
+  severity  SafetySeverity
+  category  String
+  isActive  Boolean        @default(true) @map("is_active")
+  createdAt DateTime       @default(now()) @map("created_at")
+
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@map("place_safety_advisories")
+  @@schema("wanderzee")
+}
+
+enum SafetySeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+
+  @@schema("wanderzee")
+}
+
+// ============================================================
+// BUDGET & EXPENSES
+// ============================================================
+
+model Expense {
+  id          String          @id @default(uuid()) @db.Uuid
+  tripId      String          @map("trip_id") @db.Uuid
+  category    ExpenseCategory
+  description String
+  amount      Decimal         @db.Decimal(10, 2)
+  currency    String          @default("INR")
+  paidAt      DateTime        @default(now()) @map("paid_at")
+  createdAt   DateTime        @default(now()) @map("created_at")
+
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@index([tripId])
+  @@map("expenses")
+  @@schema("wanderzee")
+}
+
+enum ExpenseCategory {
+  FOOD
+  TRANSPORT
+  ACCOMMODATION
+  ENTRY_FEE
+  SHOPPING
+  ACTIVITY
+  MEDICAL
+  OTHER
+
+  @@schema("wanderzee")
+}
