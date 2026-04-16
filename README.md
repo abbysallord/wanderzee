@@ -27,6 +27,7 @@ Make every trip in Karnataka as smooth, safe, and memorable as possible for ever
 **Mission:** To be the most reliable, AI-powered travel companion that understands WHO you are, WHY you're traveling, and WHAT you need — and plans every step accordingly.
 
 ### Core Principles
+
 - **Trust & Reliability** — Users must trust our recommendations with their safety
 - **Privacy First** — Sensitive data encrypted and user-controlled
 - **Offline-First** — Works without internet; syncs when available
@@ -38,6 +39,7 @@ Make every trip in Karnataka as smooth, safe, and memorable as possible for ever
 ## ✨ Features
 
 ### MVP (v1.0) — Current Development
+
 - [x] User authentication (email + Google OAuth)
 - [x] User profile with preferences, health notes, accessibility needs
 - [x] AI Trip Planner powered by Gemini & Groq
@@ -52,6 +54,7 @@ Make every trip in Karnataka as smooth, safe, and memorable as possible for ever
 - [ ] SOS button
 
 ### v2.0 — Post-MVP
+
 - Community reviews & ratings
 - Trip journal with photo support
 - Group trip collaboration
@@ -60,6 +63,7 @@ Make every trip in Karnataka as smooth, safe, and memorable as possible for ever
 - Smart notifications
 
 ### v3.0 — Long-term Vision
+
 - AR navigation
 - Local guide marketplace
 - Travel insurance integration
@@ -70,6 +74,7 @@ Make every trip in Karnataka as smooth, safe, and memorable as possible for ever
 ## 🛠 Tech Stack
 
 ### Frontend
+
 - **Flutter 3.x** — Cross-platform (Android, iOS, Web)
 - **Riverpod 2.x** — State management
 - **GoRouter** — Navigation & routing
@@ -79,6 +84,7 @@ Make every trip in Karnataka as smooth, safe, and memorable as possible for ever
 - **flutter_animate** — Animations
 
 ### Backend
+
 - **Node.js 20 + TypeScript** — Runtime
 - **NestJS** — Framework
 - **PostgreSQL 16 + PostGIS** — Database
@@ -88,10 +94,12 @@ Make every trip in Karnataka as smooth, safe, and memorable as possible for ever
 - **Swagger** — API documentation
 
 ### AI & LLMs
+
 - **Google Gemini 2.0 Flash** — Primary AI (complex plans)
 - **Groq (LLaMA 3.3 70B)** — Secondary AI (fast queries)
 
 ### Infrastructure
+
 - **Docker + Docker Compose** — Containerization
 - **GitHub Actions** — CI/CD
 - **Cloudflare** — CDN & DNS
@@ -142,12 +150,14 @@ wanderzee/
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Docker & Docker Compose
 - Node.js 20+
 - Flutter 3.x
 - PostgreSQL 16+ (or use Docker)
 
 ### Clone & Setup
+
 ```bash
 # Clone repository
 git clone https://github.com/yourusername/wanderzee.git
@@ -171,6 +181,7 @@ npm run start:dev
 ```
 
 ### Mobile App Setup
+
 ```bash
 cd apps/mobile
 flutter pub get
@@ -221,6 +232,7 @@ flutter run -d chrome
 ### Environment Variables
 
 Create `.env` in `apps/api/`:
+
 ```
 # Database
 DATABASE_URL=postgresql://user:password@localhost:5432/wanderzee
@@ -270,36 +282,36 @@ flutter build web      # Build web
 
 ### Key Endpoints
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| **Auth** |
-| POST | /auth/register | Register new user | — |
-| POST | /auth/login | Login with credentials | — |
-| POST | /auth/refresh | Refresh access token | JWT |
-| **User** |
-| GET | /users/me | Get current user profile | JWT |
-| PUT | /users/me/profile | Update user profile | JWT |
-| DELETE | /users/me | Delete account | JWT |
+| Method            | Endpoint                   | Description              | Auth |
+| ----------------- | -------------------------- | ------------------------ | ---- |
+| **Auth**          |
+| POST              | /auth/register             | Register new user        | —    |
+| POST              | /auth/login                | Login with credentials   | —    |
+| POST              | /auth/refresh              | Refresh access token     | JWT  |
+| **User**          |
+| GET               | /users/me                  | Get current user profile | JWT  |
+| PUT               | /users/me/profile          | Update user profile      | JWT  |
+| DELETE            | /users/me                  | Delete account           | JWT  |
 | **Trip Planning** |
-| POST | /ai/generate-trip | Generate AI trip plan | JWT |
-| GET | /trips | Get user's trips | JWT |
-| GET | /trips/:id | Get trip details | JWT |
-| PATCH | /trips/:id/status | Update trip status | JWT |
-| DELETE | /trips/:id | Delete trip | JWT |
-| **Places** |
-| GET | /places | List places (filtered) | — |
-| GET | /places/districts | Get Karnataka districts | — |
-| GET | /places/nearby | Find nearby places | — |
-| GET | /places/:id | Get place details | — |
-| **Budget** |
-| POST | /trips/:id/expenses | Add expense | JWT |
-| GET | /trips/:id/expenses | Get trip expenses | JWT |
-| DELETE | /trips/:id/expenses/:eid | Delete expense | JWT |
-| **Safety** |
-| GET | /safety/advisories | Get safety advisories | — |
-| GET | /safety/emergency-contacts | Get emergency contacts | — |
-| **Health** |
-| GET | /health | Health check | — |
+| POST              | /ai/generate-trip          | Generate AI trip plan    | JWT  |
+| GET               | /trips                     | Get user's trips         | JWT  |
+| GET               | /trips/:id                 | Get trip details         | JWT  |
+| PATCH             | /trips/:id/status          | Update trip status       | JWT  |
+| DELETE            | /trips/:id                 | Delete trip              | JWT  |
+| **Places**        |
+| GET               | /places                    | List places (filtered)   | —    |
+| GET               | /places/districts          | Get Karnataka districts  | —    |
+| GET               | /places/nearby             | Find nearby places       | —    |
+| GET               | /places/:id                | Get place details        | —    |
+| **Budget**        |
+| POST              | /trips/:id/expenses        | Add expense              | JWT  |
+| GET               | /trips/:id/expenses        | Get trip expenses        | JWT  |
+| DELETE            | /trips/:id/expenses/:eid   | Delete expense           | JWT  |
+| **Safety**        |
+| GET               | /safety/advisories         | Get safety advisories    | —    |
+| GET               | /safety/emergency-contacts | Get emergency contacts   | —    |
+| **Health**        |
+| GET               | /health                    | Health check             | —    |
 
 See [WANDERZEE_MASTER_DOC.md](docs/WANDERZEE_MASTER_DOC.md) for comprehensive documentation.
 
@@ -307,14 +319,14 @@ See [WANDERZEE_MASTER_DOC.md](docs/WANDERZEE_MASTER_DOC.md) for comprehensive do
 
 ## 👥 Target Users
 
-| Persona | Description | Key Needs |
-|---------|-------------|-----------|
-| 🧳 Business Traveler | Corporate trips, tight schedules | Efficient routes, meeting-friendly locations |
-| 🎓 Student Explorer | Educational/research trips | Museums, universities, affordable options |
-| 🛕 Pilgrim | Religious/spiritual journeys | Temple routes, cultural etiquette, dietary needs |
-| 👨‍👩‍👧‍👦 Family Vacationer | Leisure with kids/elderly | Kid-friendly spots, accessibility, medical facilities |
-| 🎒 Solo Backpacker | Budget adventure travel | Cheapest routes, hostels, safety alerts, hidden gems |
-| ♿ Accessibility-First | Physical/health limitations | Wheelchair access, medical facilities, low-exertion routes |
+| Persona                | Description                      | Key Needs                                                  |
+| ---------------------- | -------------------------------- | ---------------------------------------------------------- |
+| 🧳 Business Traveler   | Corporate trips, tight schedules | Efficient routes, meeting-friendly locations               |
+| 🎓 Student Explorer    | Educational/research trips       | Museums, universities, affordable options                  |
+| 🛕 Pilgrim             | Religious/spiritual journeys     | Temple routes, cultural etiquette, dietary needs           |
+| 👨‍👩‍👧‍👦 Family Vacationer   | Leisure with kids/elderly        | Kid-friendly spots, accessibility, medical facilities      |
+| 🎒 Solo Backpacker     | Budget adventure travel          | Cheapest routes, hostels, safety alerts, hidden gems       |
+| ♿ Accessibility-First | Physical/health limitations      | Wheelchair access, medical facilities, low-exertion routes |
 
 ---
 
@@ -325,6 +337,7 @@ We love contributions! Whether it's bug reports, features, or documentation, you
 **Start here:** [CONTRIBUTING.md](CONTRIBUTING.md)
 
 Quick overview:
+
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Follow our [code conventions](CONTRIBUTING.md#commit-conventions)

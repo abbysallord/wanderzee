@@ -23,12 +23,14 @@ This document will guide you through the contribution process, from setup to sub
 ## 📖 Code of Conduct
 
 By participating in this project, you agree to uphold our values of:
+
 - **Respect** — Treat all community members with respect
 - **Inclusivity** — Welcome contributors from all backgrounds and experience levels
 - **Collaboration** — Work together constructively
 - **Transparency** — Communicate openly and honestly
 
 ### We Do Not Tolerate
+
 - Harassment, discrimination, or offensive language
 - Spam or self-promotion
 - Disruptive behavior
@@ -40,6 +42,7 @@ Violations may result in removal from the project. For concerns, contact: **cond
 ## 🚀 Getting Started
 
 ### 1. Fork & Clone
+
 ```bash
 # Fork the repository on GitHub
 # Then clone your fork
@@ -51,7 +54,9 @@ git remote add upstream https://github.com/ORIGINAL-OWNER/wanderzee.git
 ```
 
 ### 2. Check Your Environment
+
 Ensure you have:
+
 - Node.js 20+
 - Flutter 3.x (for mobile work)
 - Docker & Docker Compose
@@ -66,6 +71,7 @@ git --version
 ```
 
 ### 3. Complete Development Setup
+
 Follow the [Development Setup](#development-setup) section below.
 
 ---
@@ -152,14 +158,14 @@ We follow a Git Flow-inspired branching strategy:
 
 ### Branch Types
 
-| Branch Type | Format | Example | Purpose |
-|------------|--------|---------|---------|
-| **Main** | `main` | `main` | Production-ready code, tagged releases |
-| **Develop** | `develop` | `develop` | Integration branch for features |
-| **Feature** | `feature/*` | `feature/trip-planner-ui` | New features & enhancements |
-| **Bug Fix** | `fix/*` | `fix/auth-token-issue` | Bug fixes |
-| **Docs** | `docs/*` | `docs/api-setup-guide` | Documentation updates only |
-| **Chore** | `chore/*` | `chore/update-dependencies` | Maintenance, no code logic change |
+| Branch Type | Format      | Example                     | Purpose                                |
+| ----------- | ----------- | --------------------------- | -------------------------------------- |
+| **Main**    | `main`      | `main`                      | Production-ready code, tagged releases |
+| **Develop** | `develop`   | `develop`                   | Integration branch for features        |
+| **Feature** | `feature/*` | `feature/trip-planner-ui`   | New features & enhancements            |
+| **Bug Fix** | `fix/*`     | `fix/auth-token-issue`      | Bug fixes                              |
+| **Docs**    | `docs/*`    | `docs/api-setup-guide`      | Documentation updates only             |
+| **Chore**   | `chore/*`   | `chore/update-dependencies` | Maintenance, no code logic change      |
 
 ### Branch Naming Rules
 
@@ -169,6 +175,7 @@ We follow a Git Flow-inspired branching strategy:
 - Reference **issue number** if applicable: `feature/add-budget-tracking-#123`
 
 **Examples:**
+
 ```bash
 ✅ feature/budget-tracker
 ✅ fix/offline-sync-issue
@@ -199,6 +206,7 @@ git push origin feature/your-feature-name
 We follow **Conventional Commits** for clear, semantic commit messages.
 
 ### Format
+
 ```
 type(scope): description
 
@@ -209,21 +217,22 @@ type(scope): description
 
 ### Types
 
-| Type | Use Case |
-|------|----------|
-| `feat` | New feature |
-| `fix` | Bug fix |
-| `docs` | Documentation only |
-| `style` | Code style (formatting, lint, etc.) |
-| `refactor` | Code refactoring (no behavior change) |
-| `test` | Adding/updating tests |
-| `chore` | Maintenance, deps, config (no code logic) |
-| `perf` | Performance improvement |
-| `ci` | CI/CD configuration |
+| Type       | Use Case                                  |
+| ---------- | ----------------------------------------- |
+| `feat`     | New feature                               |
+| `fix`      | Bug fix                                   |
+| `docs`     | Documentation only                        |
+| `style`    | Code style (formatting, lint, etc.)       |
+| `refactor` | Code refactoring (no behavior change)     |
+| `test`     | Adding/updating tests                     |
+| `chore`    | Maintenance, deps, config (no code logic) |
+| `perf`     | Performance improvement                   |
+| `ci`       | CI/CD configuration                       |
 
 ### Scope
 
 Relevant module or component affected:
+
 - `auth` — Authentication
 - `trip-planner` — AI trip planner
 - `budget` — Budget tracking
@@ -297,32 +306,40 @@ git push origin feature/your-feature-name
 
 ```markdown
 ## Description
+
 Brief description of what this PR does.
 
 ## Related Issue
+
 Fixes #123
 
 ## Type of Change
+
 - [ ] New feature
 - [ ] Bug fix
 - [ ] Documentation update
 - [ ] Refactoring
 
 ## Changes Made
+
 - Change 1
 - Change 2
 - Change 3
 
 ## Testing
+
 Describe testing performed:
+
 - [ ] Unit tests pass
 - [ ] E2E tests pass
 - [ ] Manual testing completed
 
 ## Screenshots (if applicable)
+
 Include screenshots for UI changes.
 
 ## Checklist
+
 - [ ] Code follows style guide
 - [ ] Tests added/updated
 - [ ] Documentation updated
@@ -460,15 +477,16 @@ flutter test --update-goldens
 - **E2E tests** for critical user flows
 
 **Example Test:**
+
 ```typescript
-describe('Trip Planning (E2E)', () => {
-  it('should generate a 3-day trip plan', async () => {
+describe("Trip Planning (E2E)", () => {
+  it("should generate a 3-day trip plan", async () => {
     const response = await request(app.getHttpServer())
-      .post('/api/v1/ai/generate-trip')
+      .post("/api/v1/ai/generate-trip")
       .send({
         duration: 3,
         budget: 5000,
-        district: 'Kodagu'
+        district: "Kodagu",
       })
       .expect(201);
 
@@ -596,20 +614,24 @@ git rebase --continue
 ## 💬 Getting Help
 
 ### Documentation
+
 - [README.md](README.md) — Project overview
 - [WANDERZEE_MASTER_DOC.md](docs/WANDERZEE_MASTER_DOC.md) — Complete documentation
 - [API Docs](http://localhost:3000/api/docs) — Swagger UI (run server first)
 
 ### Community
+
 - **GitHub Issues** — Report bugs or request features
 - **GitHub Discussions** — Ask questions and discuss ideas
 - **Discord** — (if applicable) Real-time chat with team
 
 ### Contact
+
 - **Email:** dev-team@wanderzee.in
 - **Issues:** [GitHub Issues](https://github.com/yourusername/wanderzee/issues)
 
 ### Before Asking
+
 1. Check documentation
 2. Search existing issues
 3. Review commit history for similar changes
@@ -620,16 +642,19 @@ git rebase --continue
 ## 🎓 Learning Resources
 
 ### Backend (NestJS)
+
 - [NestJS Documentation](https://docs.nestjs.com/)
 - [Prisma Docs](https://www.prisma.io/docs/)
 - [PostgreSQL Docs](https://www.postgresql.org/docs/)
 
 ### Mobile (Flutter)
+
 - [Flutter Documentation](https://flutter.dev/docs)
 - [Dart Language Guide](https://dart.dev/guides)
 - [Riverpod State Management](https://riverpod.dev/)
 
 ### General
+
 - [Git Flow Cheatsheet](https://danielkummer.github.io/git-flow-cheatsheet/)
 - [Conventional Commits](https://www.conventionalcommits.org/)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
@@ -660,4 +685,4 @@ We appreciate your contributions to making WanderZee better. Every contribution 
 
 ---
 
-*For detailed project information, see [WANDERZEE_MASTER_DOC.md](docs/WANDERZEE_MASTER_DOC.md)*
+_For detailed project information, see [WANDERZEE_MASTER_DOC.md](docs/WANDERZEE_MASTER_DOC.md)_
