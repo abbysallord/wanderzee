@@ -43,153 +43,168 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isWide = screenWidth >= 900;
+    final maxContentWidth = isWide ? 920.0 : 600.0;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: Column(
-          children: [
-            Align(
-              alignment: Alignment.topRight,
-              child: TextButton(
-                onPressed: () => context.go('/login'),
-                child: const Text(
-                  'Skip',
-                  style: TextStyle(fontFamily: 'Poppins', color: AppColors.textMuted, fontSize: 16),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxContentWidth),
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: isWide ? 32 : 8),
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: TextButton(
+                      onPressed: () => context.go('/login'),
+                      child: const Text(
+                        'Skip',
+                        style: TextStyle(fontFamily: 'Poppins', color: AppColors.textMuted, fontSize: 16),
+                      ),
+                    ),
+                  ),
+                ).animate().fadeIn(delay: 500.ms),
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    onPageChanged: (index) => setState(() => _currentPage = index),
+                    itemCount: _pages.length,
+                    itemBuilder: (context, index) {
+                      final page = _pages[index];
+                      return Padding(
+                        padding: EdgeInsets.symmetric(horizontal: isWide ? 72 : 40),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: isWide ? 168 : 140,
+                              height: isWide ? 168 : 140,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [page.color.withOpacity(0.2), page.color.withOpacity(0.05)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(page.icon, size: isWide ? 74 : 64, color: page.color),
+                            )
+                                .animate(onPlay: (controller) => controller.repeat(reverse: true))
+                                .scale(
+                                  begin: const Offset(1, 1),
+                                  end: const Offset(1.05, 1.05),
+                                  duration: 2.seconds,
+                                  curve: Curves.easeInOut,
+                                ),
+                            SizedBox(height: isWide ? 54 : 48),
+                            Text(
+                              page.title,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: isWide ? 32 : 26,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              page.subtitle,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: isWide ? 16 : 15,
+                                color: AppColors.textSecondary,
+                                height: 1.6,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ).animate().fadeIn(delay: 500.ms),
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                onPageChanged: (index) => setState(() => _currentPage = index),
-                itemCount: _pages.length,
-                itemBuilder: (context, index) {
-                  final page = _pages[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    _pages.length,
+                    (index) => AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      width: _currentPage == index ? 32 : 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: _currentPage == index
+                            ? AppColors.primary
+                            : AppColors.primary.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: isWide ? 28 : 40),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: isWide ? 32 : 24),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 460),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          width: 140,
-                          height: 140,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [page.color.withOpacity(0.2), page.color.withOpacity(0.05)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
+                        SizedBox(
+                          width: double.infinity,
+                          height: 56,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (_currentPage < _pages.length - 1) {
+                                _pageController.nextPage(
+                                  duration: const Duration(milliseconds: 400),
+                                  curve: Curves.easeOutCubic,
+                                );
+                              } else {
+                                context.go('/register');
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              elevation: 0,
                             ),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(page.icon, size: 64, color: page.color),
-                        )
-                            .animate(onPlay: (controller) => controller.repeat(reverse: true))
-                            .scale(
-                              begin: const Offset(1, 1),
-                              end: const Offset(1.05, 1.05),
-                              duration: 2.seconds,
-                              curve: Curves.easeInOut,
+                            child: Text(
+                              _currentPage < _pages.length - 1 ? 'Next' : 'Get Started',
+                              style: const TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
                             ),
-                        const SizedBox(height: 48),
-                        Text(
-                          page.title,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 26,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          page.subtitle,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 15,
-                            color: AppColors.textSecondary,
-                            height: 1.6,
+                        const SizedBox(height: 12),
+                        TextButton(
+                          onPressed: () => context.go('/login'),
+                          child: RichText(
+                            text: const TextSpan(
+                              style: TextStyle(fontFamily: 'Poppins', fontSize: 14),
+                              children: [
+                                TextSpan(text: 'Already have an account? ', style: TextStyle(color: AppColors.textMuted)),
+                                TextSpan(text: 'Sign In', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600)),
+                              ],
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  );
-                },
-              ),
+                  ),
+                ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.3),
+                const SizedBox(height: 24),
+              ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                _pages.length,
-                (index) => AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: _currentPage == index ? 32 : 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: _currentPage == index
-                        ? AppColors.primary
-                        : AppColors.primary.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 40),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (_currentPage < _pages.length - 1) {
-                          _pageController.nextPage(
-                            duration: const Duration(milliseconds: 400),
-                            curve: Curves.easeOutCubic,
-                          );
-                        } else {
-                          context.go('/register');
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        _currentPage < _pages.length - 1 ? 'Next' : 'Get Started',
-                        style: const TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  TextButton(
-                    onPressed: () => context.go('/login'),
-                    child: RichText(
-                      text: const TextSpan(
-                        style: TextStyle(fontFamily: 'Poppins', fontSize: 14),
-                        children: [
-                          TextSpan(text: 'Already have an account? ', style: TextStyle(color: AppColors.textMuted)),
-                          TextSpan(text: 'Sign In', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600)),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.3),
-            const SizedBox(height: 24),
-          ],
+          ),
         ),
       ),
     );

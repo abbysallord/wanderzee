@@ -8,25 +8,44 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isDesktop = screenWidth >= 1100;
+    final isTablet = screenWidth >= 700;
+    final horizontalPadding = isDesktop ? 32.0 : (isTablet ? 24.0 : 20.0);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 20),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1120),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Hello, Traveler! 👋', style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: AppColors.textMuted)),
-                      const SizedBox(height: 4),
-                      const Text('Explore Karnataka', style: TextStyle(fontFamily: 'Poppins', fontSize: 26, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-                    ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Hello, Traveler! 👋', style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: AppColors.textMuted)),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Explore Karnataka',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: isDesktop ? 30 : 26,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 12),
                   CircleAvatar(
                     radius: 24,
                     backgroundColor: AppColors.primary.withOpacity(0.1),
@@ -88,32 +107,56 @@ class HomeScreen extends StatelessWidget {
               const Text('Quick Actions', style: TextStyle(fontFamily: 'Poppins', fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary))
                   .animate().fadeIn(delay: 300.ms),
               const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(child: _QuickActionCard(icon: Icons.map_rounded,          label: 'Explore Map', color: AppColors.secondary, onTap: () => context.go('/map'))),
-                  const SizedBox(width: 12),
-                  Expanded(child: _QuickActionCard(icon: Icons.shield_rounded,        label: 'Safety Info', color: AppColors.success,   onTap: () => context.go('/safety'))),
-                  const SizedBox(width: 12),
-                  Expanded(child: _QuickActionCard(icon: Icons.phone_in_talk_rounded, label: 'Emergency',   color: AppColors.error,     onTap: () {})),
-                ],
-              ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2),
+              if (isTablet)
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    SizedBox(width: 220, child: _QuickActionCard(icon: Icons.map_rounded,          label: 'Explore Map', color: AppColors.secondary, onTap: () => context.go('/map'))),
+                    SizedBox(width: 220, child: _QuickActionCard(icon: Icons.shield_rounded,        label: 'Safety Info', color: AppColors.success,   onTap: () => context.go('/safety'))),
+                    SizedBox(width: 220, child: _QuickActionCard(icon: Icons.phone_in_talk_rounded, label: 'Emergency',   color: AppColors.error,     onTap: () {})),
+                  ],
+                ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2)
+              else
+                Row(
+                  children: [
+                    Expanded(child: _QuickActionCard(icon: Icons.map_rounded,          label: 'Explore Map', color: AppColors.secondary, onTap: () => context.go('/map'))),
+                    const SizedBox(width: 12),
+                    Expanded(child: _QuickActionCard(icon: Icons.shield_rounded,        label: 'Safety Info', color: AppColors.success,   onTap: () => context.go('/safety'))),
+                    const SizedBox(width: 12),
+                    Expanded(child: _QuickActionCard(icon: Icons.phone_in_talk_rounded, label: 'Emergency',   color: AppColors.error,     onTap: () {})),
+                  ],
+                ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2),
               const SizedBox(height: 28),
               const Text('Popular in Karnataka', style: TextStyle(fontFamily: 'Poppins', fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary))
                   .animate().fadeIn(delay: 500.ms),
               const SizedBox(height: 16),
-              SizedBox(
-                height: 180,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
+              if (isTablet)
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
                   children: const [
-                    _DestinationCard(name: 'Coorg',       subtitle: 'Scotland of India', emoji: '🏔️', color: Color(0xFF10B981)),
-                    _DestinationCard(name: 'Hampi',       subtitle: 'UNESCO Heritage',   emoji: '🏛️', color: Color(0xFFF59E0B)),
-                    _DestinationCard(name: 'Gokarna',     subtitle: 'Beach Paradise',    emoji: '🏖️', color: Color(0xFF3B82F6)),
-                    _DestinationCard(name: 'Chikmagalur', subtitle: 'Coffee Country',    emoji: '☕', color: Color(0xFF8B5CF6)),
-                    _DestinationCard(name: 'Mysuru',      subtitle: 'City of Palaces',   emoji: '👑', color: Color(0xFFEC4899)),
+                    _DestinationCard(name: 'Coorg',       subtitle: 'Scotland of India', emoji: '🏔️', color: Color(0xFF10B981), width: 200, height: 190),
+                    _DestinationCard(name: 'Hampi',       subtitle: 'UNESCO Heritage',   emoji: '🏛️', color: Color(0xFFF59E0B), width: 200, height: 190),
+                    _DestinationCard(name: 'Gokarna',     subtitle: 'Beach Paradise',    emoji: '🏖️', color: Color(0xFF3B82F6), width: 200, height: 190),
+                    _DestinationCard(name: 'Chikmagalur', subtitle: 'Coffee Country',    emoji: '☕', color: Color(0xFF8B5CF6), width: 200, height: 190),
+                    _DestinationCard(name: 'Mysuru',      subtitle: 'City of Palaces',   emoji: '👑', color: Color(0xFFEC4899), width: 200, height: 190),
                   ],
-                ),
-              ).animate().fadeIn(delay: 600.ms).slideX(begin: 0.1),
+                ).animate().fadeIn(delay: 600.ms).slideX(begin: 0.1)
+              else
+                SizedBox(
+                  height: 180,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: const [
+                      _DestinationCard(name: 'Coorg',       subtitle: 'Scotland of India', emoji: '🏔️', color: Color(0xFF10B981)),
+                      _DestinationCard(name: 'Hampi',       subtitle: 'UNESCO Heritage',   emoji: '🏛️', color: Color(0xFFF59E0B)),
+                      _DestinationCard(name: 'Gokarna',     subtitle: 'Beach Paradise',    emoji: '🏖️', color: Color(0xFF3B82F6)),
+                      _DestinationCard(name: 'Chikmagalur', subtitle: 'Coffee Country',    emoji: '☕', color: Color(0xFF8B5CF6)),
+                      _DestinationCard(name: 'Mysuru',      subtitle: 'City of Palaces',   emoji: '👑', color: Color(0xFFEC4899)),
+                    ],
+                  ),
+                ).animate().fadeIn(delay: 600.ms).slideX(begin: 0.1),
               const SizedBox(height: 28),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -142,7 +185,9 @@ class HomeScreen extends StatelessWidget {
                 ),
               ).animate().fadeIn(delay: 800.ms),
               const SizedBox(height: 20),
-            ],
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -190,13 +235,23 @@ class _DestinationCard extends StatelessWidget {
   final String subtitle;
   final String emoji;
   final Color color;
+  final double width;
+  final double? height;
 
-  const _DestinationCard({required this.name, required this.subtitle, required this.emoji, required this.color});
+  const _DestinationCard({
+    required this.name,
+    required this.subtitle,
+    required this.emoji,
+    required this.color,
+    this.width = 150,
+    this.height,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 150,
+      width: width,
+      height: height,
       margin: const EdgeInsets.only(right: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
