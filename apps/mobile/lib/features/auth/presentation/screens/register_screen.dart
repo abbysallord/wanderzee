@@ -29,6 +29,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isWide = screenWidth >= 900;
+    final horizontalPadding = isWide ? 32.0 : 24.0;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -40,12 +44,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 20),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 560),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                 const Text(
                   'Create Account',
                   style: TextStyle(fontFamily: 'Poppins', fontSize: 28, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
@@ -55,7 +62,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   'Start your Karnataka journey with WanderZee',
                   style: TextStyle(fontFamily: 'Poppins', fontSize: 15, color: AppColors.textMuted),
                 ).animate().fadeIn(delay: 100.ms).slideX(begin: -0.1),
-                const SizedBox(height: 36),
+                SizedBox(height: isWide ? 28 : 36),
                 _buildLabel('Full Name'),
                 const SizedBox(height: 8),
                 TextFormField(
@@ -183,7 +190,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                 ),
-              ],
+                  ],
+                ),
+              ),
             ),
           ),
         ),

@@ -26,17 +26,24 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isWide = screenWidth >= 900;
+    final horizontalPadding = isWide ? 32.0 : 24.0;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 40),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 20),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 560),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                SizedBox(height: isWide ? 16 : 40),
                 Center(
                   child: Container(
                     width: 80,
@@ -71,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                 ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2),
-                const SizedBox(height: 48),
+                SizedBox(height: isWide ? 36 : 48),
                 _buildLabel('Email'),
                 const SizedBox(height: 8),
                 TextFormField(
@@ -183,7 +190,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ).animate().fadeIn(delay: 700.ms),
-              ],
+                  ],
+                ),
+              ),
             ),
           ),
         ),
