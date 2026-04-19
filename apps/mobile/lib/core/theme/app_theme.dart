@@ -117,7 +117,7 @@ class AppTheme {
       ),
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surfaceLight,
-        selectedColor: Color(0x261A73B5),
+        selectedColor: const Color(0x261A73B5),
         labelStyle: const TextStyle(fontFamily: 'Poppins', fontSize: 13),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         side: BorderSide.none,

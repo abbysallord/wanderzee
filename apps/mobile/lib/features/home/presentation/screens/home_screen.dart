@@ -31,7 +31,7 @@ class HomeScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Hello, Traveler! 👋', style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: AppColors.textMuted)),
+                        const Text('Hello, Traveler! 👋', style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: AppColors.textMuted)),
                         const SizedBox(height: 4),
                         Text(
                           'Explore Karnataka',
@@ -132,10 +132,10 @@ class HomeScreen extends StatelessWidget {
                   .animate().fadeIn(delay: 500.ms),
               const SizedBox(height: 16),
               if (isTablet)
-                Wrap(
+                const Wrap(
                   spacing: 12,
                   runSpacing: 12,
-                  children: const [
+                  children: [
                     _DestinationCard(name: 'Coorg',       subtitle: 'Scotland of India', emoji: '🏔️', color: Color(0xFF10B981), width: 200, height: 190),
                     _DestinationCard(name: 'Hampi',       subtitle: 'UNESCO Heritage',   emoji: '🏛️', color: Color(0xFFF59E0B), width: 200, height: 190),
                     _DestinationCard(name: 'Gokarna',     subtitle: 'Beach Paradise',    emoji: '🏖️', color: Color(0xFF3B82F6), width: 200, height: 190),
@@ -180,7 +180,7 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(height: 12),
                     const Text('No trips yet', style: TextStyle(fontFamily: 'Poppins', fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
                     const SizedBox(height: 4),
-                    Text('Plan your first Karnataka adventure!', style: TextStyle(fontFamily: 'Poppins', fontSize: 13, color: AppColors.textMuted)),
+                    const Text('Plan your first Karnataka adventure!', style: TextStyle(fontFamily: 'Poppins', fontSize: 13, color: AppColors.textMuted)),
                   ],
                 ),
               ).animate().fadeIn(delay: 800.ms),
