@@ -58,7 +58,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: TextStyle(fontFamily: 'Poppins', fontSize: 28, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
                 ).animate().fadeIn().slideX(begin: -0.1),
                 const SizedBox(height: 8),
-                Text(
+                const Text(
                   'Start your Karnataka journey with WanderZee',
                   style: TextStyle(fontFamily: 'Poppins', fontSize: 15, color: AppColors.textMuted),
                 ).animate().fadeIn(delay: 100.ms).slideX(begin: -0.1),

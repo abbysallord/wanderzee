@@ -63,14 +63,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
                 const SizedBox(height: 32),
-                Center(
+                const Center(
                   child: Column(
                     children: [
-                      const Text(
+                      Text(
                         'Welcome Back',
                         style: TextStyle(fontFamily: 'Poppins', fontSize: 28, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
                       Text(
                         'Sign in to continue your journey',
                         style: TextStyle(fontFamily: 'Poppins', fontSize: 15, color: AppColors.textMuted),
@@ -155,8 +155,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   children: [
                     Expanded(child: Divider(color: Colors.grey.shade300)),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Text('or continue with', style: TextStyle(fontFamily: 'Poppins', color: AppColors.textMuted, fontSize: 13)),
                     ),
                     Expanded(child: Divider(color: Colors.grey.shade300)),
